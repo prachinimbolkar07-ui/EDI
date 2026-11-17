@@ -4,7 +4,7 @@ import { useAuth } from '../AuthContext.jsx'
 
 const links = {
   Donor: [['/dashboard', 'My dashboard']],
-  Organiser: [['/create', 'Start a campaign'], ['/release', 'Request funds'], ['/evidence', 'Upload evidence']],
+  Organiser: [['/organiser', 'Dashboard'], ['/create', 'Start a campaign'], ['/release', 'Request funds'], ['/evidence', 'Upload evidence']],
   Reviewer: [['/review', 'Review requests']],
   Admin: [['/admin', 'Admin']],
 }
@@ -28,7 +28,7 @@ export default function Navbar() {
   return (
     <header className="nav">
       <div className="nav-in">
-        <Link to="/" className="brand" onClick={close}><i /> DonateWeb3</Link>
+        <Link to="/" className="brand" onClick={close}><i /> TraceGood</Link>
 
         <button className="menu-btn" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? 'Close' : 'Menu'}

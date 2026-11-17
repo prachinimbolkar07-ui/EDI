@@ -1,68 +1,64 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../AuthContext.jsx'
+import { useAccounts } from '../AccountsContext.jsx'
 
-const roles = ['Donor', 'Organiser', 'Reviewer', 'Admin']
-const home = { Donor: '/dashboard', Organiser: '/release', Reviewer: '/review', Admin: '/admin' }
-const about = {
-  Donor: 'Donate to campaigns and track how funds are used.',
-  Organiser: 'Create campaigns, request funds and submit evidence.',
-  Reviewer: 'Check fund requests and evidence, then approve or reject.',
-  Admin: 'Verify organisations and manage reviewers.',
-}
+const home = { Donor: '/dashboard', Organiser: '/organiser', Reviewer: '/review', Admin: '/admin' }
 
 export default function Login() {
   const { login } = useAuth()
+  const { accounts } = useAccounts()
   const navigate = useNavigate()
-  const [mode, setMode] = useState('login')
-  const [role, setRole] = useState('Donor')
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
-
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
   function handleSubmit(e) {
     e.preventDefault()
-    login(role, form.name || form.email.split('@')[0])
-    navigate(home[role])
+    const u = accounts.find((x) => x.email === email.trim().toLowerCase() && x.password === password)
+    if (!u) {
+      setError('Email or password is incorrect.')
+      return
+    }
+    login(u.role, u.name, u.org)
+    navigate(home[u.role])
   }
 
   return (
     <section className="wrap narrow">
-      <h1>{mode === 'login' ? 'Log in' : 'Create an account'}</h1>
-      <p className="lead">Choose how you want to use DonateWeb3.</p>
-
-      <div className="filters">
-        {roles.map((r) => (
-          <button key={r} type="button" className={'chip' + (r === role ? ' on' : '')} onClick={() => setRole(r)}>{r}</button>
-        ))}
-      </div>
-      <p className="muted small-t">{about[role]}</p>
+      <h1>Log in</h1>
+      <p className="lead">Sign in with your TraceGood account. Your access is set by your account.</p>
 
       <form className="panel" onSubmit={handleSubmit}>
-        {mode === 'register' && (
-          <>
-            <label htmlFor="name">Full name</label>
-            <input id="name" required value={form.name} onChange={set('name')} />
-          </>
-        )}
-
         <label htmlFor="email">Email</label>
-        <input id="email" type="email" required value={form.email} onChange={set('email')} />
+        <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
 
         <label htmlFor="pw">Password</label>
-        <input id="pw" type="password" minLength="6" required value={form.password} onChange={set('password')} />
+        <input id="pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
 
-        <button className="btn full">{mode === 'login' ? 'Log in' : 'Create account'}</button>
+        {error && <p style={{ color: 'var(--red)', fontWeight: 600 }}>{error}</p>}
 
-        <p className="muted small-t">
-          {mode === 'login' ? 'New here? ' : 'Already have an account? '}
-          <button type="button" className="link" style={{ background: 'none', border: 0, cursor: 'pointer', padding: 0, font: 'inherit' }}
-            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
-            {mode === 'login' ? 'Create an account' : 'Log in'}
-          </button>
-        </p>
-        <p className="muted small-t">Prototype only: any email and password works. Real login comes with the backend.</p>
+        <button className="btn full">Log in</button>
+        <p className="muted small-t">New to TraceGood? <Link className="link" to="/register">Create an account</Link></p>
       </form>
+
+      <details style={{ marginTop: 24 }}>
+        <summary className="muted small-t" style={{ cursor: 'pointer' }}>Demo accounts (for testing only)</summary>
+        <table style={{ marginTop: 12 }}>
+          <thead>
+            <tr><th>Account</th><th>Email</th><th>Password</th></tr>
+          </thead>
+          <tbody>
+            {accounts.map((u) => (
+              <tr key={u.email}>
+                <td>{u.name}</td>
+                <td><code>{u.email}</code></td>
+                <td><code>{u.password}</code></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
     </section>
   )
 }
