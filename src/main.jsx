@@ -21,6 +21,7 @@ async function start() {
     const { BrowserRouter } = await import('react-router-dom')
     const { default: App } = await import('./App.jsx')
     const { AuthProvider } = await import('./AuthContext.jsx')
+    const { AccountsProvider } = await import('./AccountsContext.jsx')
     const { CampaignsProvider } = await import('./CampaignsContext.jsx')
     const { RequestsProvider } = await import('./RequestsContext.jsx')
     const { EvidenceProvider } = await import('./EvidenceContext.jsx')
@@ -29,13 +30,15 @@ async function start() {
     root.render(
       <BrowserRouter>
         <AuthProvider>
-          <CampaignsProvider>
-            <RequestsProvider>
-              <EvidenceProvider>
-                <App />
-              </EvidenceProvider>
-            </RequestsProvider>
-          </CampaignsProvider>
+          <AccountsProvider>
+            <CampaignsProvider>
+              <RequestsProvider>
+                <EvidenceProvider>
+                  <App />
+                </EvidenceProvider>
+              </RequestsProvider>
+            </CampaignsProvider>
+          </AccountsProvider>
         </AuthProvider>
       </BrowserRouter>
     )
